@@ -295,42 +295,46 @@ def main():
             mnist(noTrSamples=6000,noTsSamples=1000,\
             digit_range=[0,1,2,3,4,5,6,7,8,9],\
             noTrPerClass=600, noTsPerClass=100)
-    # initialize learning rate and num_iterations
-    learning_rate = 0.007
-    num_iterations = 500
-    decay_rate = 0.01
+
+    learning_rate_array = [0.01, 0.07, 0.1]
+    num_iterations = 300
     batch_size = 10
-    
-    costs, val_loss, parameters = multi_layer_network(train_data, train_label, net_dims, num_iterations=num_iterations, learning_rate=learning_rate,  decay_rate=decay_rate , batch_size = batch_size)
-    
-    # compute the accuracy for training set and testing set
-    train_Pred = classify(train_data, parameters)
-    test_Pred = classify(test_data, parameters)
-    
-    test_error = ((test_Pred[0]!=test_label[0]).sum())/ test_Pred[0].sum()    
-    print("Test error: {0:0.4f} ".format(test_error))
+    plots = []
 
-    trAcc = train_Pred - train_label
-    teAcc = test_Pred - test_label
-    trAcc[trAcc != 0] = 1
-    teAcc[teAcc != 0] = 1
-    
-    trAcc = ( 1 - np.count_nonzero(train_Pred - train_label ) / float(train_Pred.shape[1])) * 100 
-    teAcc = ( 1 - np.count_nonzero(test_Pred - test_label ) / float(test_Pred.shape[1]) ) * 100
 
-    print("Accuracy for training set is {0:0.3f} %".format(trAcc))
-    print("Accuracy for testing set is {0:0.3f} %".format(teAcc))
+    for learning_rate in learning_rate_array:
 
-    # train_loss, = plt.plot([x for x in range(num_iterations) if x % 10 == 0], costs)
-    # val_loss, = plt.plot([x for x in range(num_iterations) if x % 10 == 0], val_loss)
-    points = np.arange(0, 500)
-    train_loss, = plt.plot(points,costs[:500])
-    val_loss, = plt.plot(val_loss)
-    plt.xlabel("No Of Iterations")
-    plt.ylabel("Cost/ val_loss")
-    plt.title("Loss vs Number of Iterations with "+str(learning_rate)+" Learning rate")
-    plt.legend((train_loss, val_loss), ("Train set Loss", "Validation Set Loss"))
-    plt.show()
+        costs, val_loss, parameters = multi_layer_network(train_data, train_label, net_dims, num_iterations=num_iterations, learning_rate=learning_rate, batch_size=batch_size)
+
+        # compute the accuracy for training set and testing set
+        train_Pred = classify(train_data, parameters)
+        test_Pred = classify(test_data, parameters)
+
+        test_error = ((test_Pred[0]!=test_label[0]).sum())/ test_Pred[0].sum()
+        print("Test error: {0:0.4f} ".format(test_error))
+
+        trAcc = train_Pred - train_label
+        teAcc = test_Pred - test_label
+        trAcc[trAcc != 0] = 1
+        teAcc[teAcc != 0] = 1
+
+        trAcc = ( 1 - np.count_nonzero(train_Pred - train_label ) / float(train_Pred.shape[1])) * 100
+        teAcc = ( 1 - np.count_nonzero(test_Pred - test_label ) / float(test_Pred.shape[1]) ) * 100
+
+        print("Accuracy for training set is {0:0.3f} %".format(trAcc))
+        print("Accuracy for testing set is {0:0.3f} %".format(teAcc))
+
+        # points = np.arange(0, 300)
+        # plot_train, = plt.plot(costs[:len(costs)])
+        # # plots.append(plot_train)
+        plot_val, = plt.plot(val_loss)
+        plots.append(plot_val)
+        plt.xlabel("No Of Iterations")
+        plt.ylabel("Cost/ val_loss")
+        plt.title("Loss vs Number of Iterations with varying Learning rates for ADAM")
+
+    plt.legend(plots,learning_rate_array)
+    plt.savefig("Loss plot for ADAM's Momentum")
 
 if __name__ == "__main__":
     main()
