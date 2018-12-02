@@ -267,7 +267,7 @@ def main():
 
     learning_rate_array = [0.01, 0.07, 0.1]
     num_iterations = 300
-    batch_size = 10
+    batch_size = 1
     plots = []
 
 
